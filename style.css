@@ -29,10 +29,10 @@ body {
 }
 
 .flower {
-  width: 50px;
-  height: 60px;
+  width: 47px;
+  height: 53px;
   position: absolute;
-  bottom: 0; 
+  bottom:auto; 
   background-size: contain;
   background-repeat: no-repeat;
   image-rendering: pixelated;
