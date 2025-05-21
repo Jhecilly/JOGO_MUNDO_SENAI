@@ -22,6 +22,7 @@ body {
   height: 40px;
   position: absolute;
   bottom: 0;
+  left: 50px;
   background-image: url('char1.png');
   background-size: cover;
   image-rendering: pixelated;
@@ -32,6 +33,7 @@ body {
   height: 40px;
   position: absolute;
   bottom: 0;
+  left: 800px;
   background-size: contain;
   background-repeat: no-repeat;
   image-rendering: pixelated;
@@ -48,5 +50,15 @@ body {
   padding: 5px 10px;
   margin: 0 5px;
   cursor: pointer;
+}
+
+#score {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 5px 10px;
+  border: 1px solid #000;
+  font-size: 16px;
 }
 
