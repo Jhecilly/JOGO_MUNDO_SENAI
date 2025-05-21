@@ -12,12 +12,10 @@ let flowerIntervals = [];
 let flowers = ["flower1.png", "flower2.png"];
 let flowerIndex = 0;
 
-// Carrega o personagem selecionado
 const selectedCharacter = localStorage.getItem('selectedCharacter') || 'char1.png';
 dino.style.backgroundImage = `url('${selectedCharacter}')`;
 dino.style.backgroundSize = "cover";
 
-// Inicia o jogo automaticamente
 startGame();
 
 document.addEventListener("keydown", function (event) {
@@ -78,7 +76,6 @@ function spawnFlower() {
       pos -= 5;
       flower.style.left = pos + "px";
 
-      // Colisão mais precisa
       const dinoBottom = parseInt(window.getComputedStyle(dino).bottom) || 0;
       const dinoLeft = 75;
       const dinoWidth = 60;
