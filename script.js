@@ -35,7 +35,7 @@ function jump() {
   jumpSound.play();
   let up = 0;
   const jumpInterval = setInterval(() => {
-    if (up >= 150) { // Aumentado de 100 para 150
+    if (up >= 120) { 
       clearInterval(jumpInterval);
       const downInterval = setInterval(() => {
         if (up <= 0) {
