@@ -1,4 +1,4 @@
-const dino = document.getElementById("dino");
+ const dino = document.getElementById("dino");
 const scoreDisplay = document.getElementById("score");
 const gameOverScreen = document.getElementById("game-over");
 const finalScoreDisplay = document.getElementById("final-score");
@@ -11,11 +11,15 @@ let flowerInterval;
 let flowerIntervals = [];
 let flowers = ["flower1.png", "flower2.png"];
 let flowerIndex = 0;
+let speedMultiplier = 1; // Multiplicador de velocidade inicial
+const maxSpeedMultiplier = 2; // Limite máximo de velocidade (2x)
 
+// Carrega o personagem selecionado
 const selectedCharacter = localStorage.getItem('selectedCharacter') || 'char1.png';
 dino.style.backgroundImage = `url('${selectedCharacter}')`;
 dino.style.backgroundSize = "cover";
 
+// Inicia o jogo automaticamente
 startGame();
 
 document.addEventListener("keydown", function (event) {
@@ -32,6 +36,10 @@ function jump() {
   isJumping = true;
   jumpSound.play();
   let up = 0;
+  const baseJumpSpeed = 5; // Velocidade base do pulo
+  const jumpSpeed = baseJumpSpeed * speedMultiplier; // Ajusta com o multiplicador
+  const jumpIntervalTime = Math.max(20 / speedMultiplier, 10); // Intervalo diminui com a velocidade
+
   const jumpInterval = setInterval(() => {
     if (up >= 225) {
       clearInterval(jumpInterval);
@@ -40,15 +48,15 @@ function jump() {
           clearInterval(downInterval);
           isJumping = false;
         } else {
-          up -= 5;
+          up -= jumpSpeed;
           dino.style.bottom = up + "px";
         }
-      }, 20);
+      }, jumpIntervalTime);
     } else {
-      up += 5;
+      up += jumpSpeed;
       dino.style.bottom = up + "px";
     }
-  }, 20);
+  }, jumpIntervalTime);
 }
 
 function spawnFlower() {
@@ -65,6 +73,10 @@ function spawnFlower() {
   // Debug: Verificar posição da flor
   console.log("Flor criada: bottom =", flower.style.bottom);
 
+  const baseFlowerSpeed = 5; // Velocidade base da flor
+  const flowerSpeed = baseFlowerSpeed * speedMultiplier; // Ajusta com o multiplicador
+  const moveIntervalTime = Math.max(20 / speedMultiplier, 10); // Intervalo diminui com a velocidade
+
   const moveInterval = setInterval(() => {
     if (pos < -75) {
       flower.remove();
@@ -72,10 +84,17 @@ function spawnFlower() {
       flowerIntervals = flowerIntervals.filter(id => id !== moveInterval);
       score++;
       scoreDisplay.innerText = "Pontuação: " + score;
+
+      // Aumenta a velocidade a cada 10 pontos
+      if (score % 10 === 0) {
+        speedMultiplier = Math.min(maxSpeedMultiplier, speedMultiplier + 0.1);
+        console.log("Velocidade aumentada: speedMultiplier =", speedMultiplier);
+      }
     } else {
-      pos -= 5;
+      pos -= flowerSpeed;
       flower.style.left = pos + "px";
 
+      // Colisão mais precisa
       const dinoBottom = parseInt(window.getComputedStyle(dino).bottom) || 0;
       const dinoLeft = 75;
       const dinoWidth = 60;
@@ -101,13 +120,14 @@ function spawnFlower() {
         gameOverScreen.style.display = "block";
       }
     }
-  }, 20);
+  }, moveIntervalTime);
   flowerIntervals.push(moveInterval);
 }
 
 function startGame() {
   gameOver = false;
   score = 0;
+  speedMultiplier = 1; // Reseta a velocidade
   scoreDisplay.innerText = "Pontuação: 0";
   gameOverScreen.style.display = "none";
   flowerInterval = setInterval(spawnFlower, 2000);
@@ -122,6 +142,7 @@ function restartGame() {
   // Reseta o jogo
   gameOver = false;
   score = 0;
+  speedMultiplier = 1; // Reseta a velocidade
   scoreDisplay.innerText = "Pontuação: 0";
   gameOverScreen.style.display = "none";
   startGame();
