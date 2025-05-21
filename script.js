@@ -8,7 +8,7 @@ let isJumping = false;
 let score = 0;
 let gameOver = false;
 let flowerInterval;
-let flowerIntervals = []; // Array para armazenar intervalos de movimento das flores
+let flowerIntervals = [];
 let flowers = ["flower1.png", "flower2.png"];
 let flowerIndex = 0;
 
@@ -35,7 +35,7 @@ function jump() {
   jumpSound.play();
   let up = 0;
   const jumpInterval = setInterval(() => {
-    if (up >= 100) {
+    if (up >= 150) { // Aumentado de 100 para 150
       clearInterval(jumpInterval);
       const downInterval = setInterval(() => {
         if (up <= 0) {
@@ -65,7 +65,7 @@ function spawnFlower() {
   document.querySelector(".game-container").appendChild(flower);
 
   const moveInterval = setInterval(() => {
-    if (pos < -40) {
+    if (pos < -50) { // Ajustado para o novo tamanho da flor (50px)
       flower.remove();
       clearInterval(moveInterval);
       flowerIntervals = flowerIntervals.filter(id => id !== moveInterval);
@@ -79,8 +79,8 @@ function spawnFlower() {
       const dinoBottom = parseInt(window.getComputedStyle(dino).bottom) || 0;
       const dinoLeft = 50;
       const flowerLeft = pos;
-      const flowerWidth = 30;
-      const flowerHeight = 40;
+      const flowerWidth = 50; // Aumentado de 30px para 50px
+      const flowerHeight = 60; // Aumentado de 40px para 60px
 
       if (
         flowerLeft < dinoLeft + 40 &&
@@ -91,7 +91,6 @@ function spawnFlower() {
         gameOverSound.play();
         gameOver = true;
         clearInterval(flowerInterval);
-        // Para o movimento de todas as flores
         flowerIntervals.forEach(id => clearInterval(id));
         flowerIntervals = [];
         finalScoreDisplay.innerText = score;
@@ -99,7 +98,7 @@ function spawnFlower() {
       }
     }
   }, 20);
-  flowerIntervals.push(moveInterval); // Armazena o intervalo da flor
+  flowerIntervals.push(moveInterval);
 }
 
 function startGame() {
