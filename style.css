@@ -23,6 +23,7 @@ body {
   position: absolute;
   bottom: 0;
   left: 50px;
+  background-color: rgba(240, 248, 255, 0);
   background-size: cover;
   image-rendering: pixelated;
 }
@@ -32,6 +33,7 @@ body {
   height: 40px;
   position: absolute;
   bottom: 0;
+  background-color: rgba(240, 248, 255, 0);
   background-size: contain;
   background-repeat: no-repeat;
   image-rendering: pixelated;
@@ -77,8 +79,8 @@ body {
 .character {
   cursor: pointer;
   padding: 10px;
-  border: 2px solid #000;
-  background-color: #ffd;
+  border: 2px solid #00000000;
+  background-color: rgba(255, 255, 221, 0);
   transition: transform 0.2s;
 }
 

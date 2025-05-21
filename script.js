@@ -8,6 +8,7 @@ let isJumping = false;
 let score = 0;
 let gameOver = false;
 let flowerInterval;
+let flowerIntervals = []; // Array para armazenar intervalos de movimento das flores
 let flowers = ["flower1.png", "flower2.png"];
 let flowerIndex = 0;
 
@@ -67,6 +68,7 @@ function spawnFlower() {
     if (pos < -40) {
       flower.remove();
       clearInterval(moveInterval);
+      flowerIntervals = flowerIntervals.filter(id => id !== moveInterval);
       score++;
       scoreDisplay.innerText = "Pontuação: " + score;
     } else {
@@ -89,11 +91,15 @@ function spawnFlower() {
         gameOverSound.play();
         gameOver = true;
         clearInterval(flowerInterval);
+        // Para o movimento de todas as flores
+        flowerIntervals.forEach(id => clearInterval(id));
+        flowerIntervals = [];
         finalScoreDisplay.innerText = score;
         gameOverScreen.style.display = "block";
       }
     }
   }, 20);
+  flowerIntervals.push(moveInterval); // Armazena o intervalo da flor
 }
 
 function startGame() {
@@ -107,6 +113,9 @@ function startGame() {
 function restartGame() {
   // Remove todas as flores
   document.querySelectorAll(".flower").forEach(flower => flower.remove());
+  // Limpa todos os intervalos de movimento
+  flowerIntervals.forEach(id => clearInterval(id));
+  flowerIntervals = [];
   // Reseta o jogo
   gameOver = false;
   score = 0;
