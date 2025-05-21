@@ -1,18 +1,31 @@
 const dino = document.getElementById("dino");
-const scoreDisplay = document.getElementById("score"); // Usa o elemento existente
+const scoreDisplay = document.getElementById("score");
+const gameOverScreen = document.getElementById("game-over");
+const finalScoreDisplay = document.getElementById("final-score");
 const jumpSound = new Audio("jump.mp3");
 const gameOverSound = new Audio("gameover.mp3");
 let isJumping = false;
 let score = 0;
-let gameStarted = false; // Controla se o jogo começou
-let flowerInterval; // Para controlar o spawn das flores
-
+let gameOver = false;
+let flowerInterval;
 let flowers = ["flower1.png", "flower2.png"];
 let flowerIndex = 0;
 
+// Carrega o personagem selecionado
+const selectedCharacter = localStorage.getItem('selectedCharacter') || 'char1.png';
+dino.style.backgroundImage = `url('${selectedCharacter}')`;
+dino.style.backgroundSize = "cover";
+
+// Inicia o jogo automaticamente
+startGame();
+
 document.addEventListener("keydown", function (event) {
-  if (event.code === "Space" && !isJumping && gameStarted) {
-    jump();
+  if (event.code === "Space") {
+    if (gameOver) {
+      restartGame();
+    } else if (!isJumping) {
+      jump();
+    }
   }
 });
 
@@ -47,7 +60,7 @@ function spawnFlower() {
 
   let pos = 800;
   flower.style.left = pos + "px";
-  flower.style.bottom = "0px"; // Garante que a flor esteja no chão
+  flower.style.bottom = "0px";
   document.querySelector(".game-container").appendChild(flower);
 
   const moveInterval = setInterval(() => {
@@ -71,27 +84,33 @@ function spawnFlower() {
         flowerLeft < dinoLeft + 40 &&
         flowerLeft + flowerWidth > dinoLeft &&
         dinoBottom < flowerHeight &&
-        gameStarted // Só verifica colisão se o jogo começou
+        !gameOver
       ) {
         gameOverSound.play();
-        clearInterval(flowerInterval); // Para o spawn de flores
-        alert("💀 Game Over! Pontuação final: " + score);
-        location.reload();
+        gameOver = true;
+        clearInterval(flowerInterval);
+        finalScoreDisplay.innerText = score;
+        gameOverScreen.style.display = "block";
       }
     }
   }, 20);
 }
 
-function selectCharacter(image) {
-  dino.style.backgroundImage = `url('${image}')`;
-  dino.style.backgroundSize = "cover";
+function startGame() {
+  gameOver = false;
+  score = 0;
+  scoreDisplay.innerText = "Pontuação: 0";
+  gameOverScreen.style.display = "none";
+  flowerInterval = setInterval(spawnFlower, 2000);
 }
 
-function startGame() {
-  if (!gameStarted) {
-    gameStarted = true;
-    score = 0; // Reseta a pontuação
-    scoreDisplay.innerText = "Pontuação: 0";
-    flowerInterval = setInterval(spawnFlower, 2000); // Começa a gerar flores
-  }
+function restartGame() {
+  // Remove todas as flores
+  document.querySelectorAll(".flower").forEach(flower => flower.remove());
+  // Reseta o jogo
+  gameOver = false;
+  score = 0;
+  scoreDisplay.innerText = "Pontuação: 0";
+  gameOverScreen.style.display = "none";
+  startGame();
 }

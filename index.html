@@ -10,12 +10,11 @@
   <div class="game-container">
     <div id="dino"></div>
     <div id="score">Pontuação: 0</div>
-  </div>
-
-  <div class="selector">
-    <button onclick="selectCharacter('char1.png')">Bonequinho 1</button>
-    <button onclick="selectCharacter('char2.png')">Bonequinho 2</button>
-    <button onclick="startGame()">Iniciar Jogo</button>
+    <div id="game-over" style="display: none;">
+      <h2>💀 Game Over!</h2>
+      <p>Pontuação final: <span id="final-score">0</span></p>
+      <p>Pressione ESPAÇO para reiniciar</p>
+    </div>
   </div>
 
   <script src="script.js"></script>

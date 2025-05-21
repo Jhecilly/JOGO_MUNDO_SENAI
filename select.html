@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jogo do Dino Fofo - Seleção</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="select-container">
+    <h1>Escolha seu Bonequinho!</h1>
+    <div class="character-selection">
+      <div class="character" onclick="selectCharacter('char1.png')">
+        <img src="char1.png" alt="Bonequinho 1" />
+      </div>
+      <div class="character" onclick="selectCharacter('char2.png')">
+        <img src="char2.png" alt="Bonequinho 2" />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function selectCharacter(image) {
+      localStorage.setItem('selectedCharacter', image);
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html> 
