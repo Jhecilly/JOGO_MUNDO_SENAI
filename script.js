@@ -35,7 +35,7 @@ function jump() {
   jumpSound.play();
   let up = 0;
   const jumpInterval = setInterval(() => {
-    if (up >= 120) { 
+    if (up >= 225) {
       clearInterval(jumpInterval);
       const downInterval = setInterval(() => {
         if (up <= 0) {
@@ -59,13 +59,16 @@ function spawnFlower() {
   flower.style.backgroundImage = `url('${flowers[flowerIndex]}')`;
   flowerIndex = (flowerIndex + 1) % flowers.length;
 
-  let pos = 800;
+  let pos = 1200;
   flower.style.left = pos + "px";
   flower.style.bottom = "0px";
   document.querySelector(".game-container").appendChild(flower);
 
+  // Debug: Verificar posição da flor
+  console.log("Flor criada: bottom =", flower.style.bottom);
+
   const moveInterval = setInterval(() => {
-    if (pos < -50) { // Ajustado para o novo tamanho da flor (50px)
+    if (pos < -75) {
       flower.remove();
       clearInterval(moveInterval);
       flowerIntervals = flowerIntervals.filter(id => id !== moveInterval);
@@ -75,19 +78,23 @@ function spawnFlower() {
       pos -= 5;
       flower.style.left = pos + "px";
 
-      // Colisão
+      // Colisão mais precisa
       const dinoBottom = parseInt(window.getComputedStyle(dino).bottom) || 0;
-      const dinoLeft = 50;
+      const dinoLeft = 75;
+      const dinoWidth = 60;
+      const dinoHeight = 60;
       const flowerLeft = pos;
-      const flowerWidth = 50; // Aumentado de 30px para 50px
-      const flowerHeight = 60; // Aumentado de 40px para 60px
+      const flowerWidth = 75;
+      const flowerHeight = 90;
 
       if (
-        flowerLeft < dinoLeft + 40 &&
+        flowerLeft < dinoLeft + dinoWidth &&
         flowerLeft + flowerWidth > dinoLeft &&
         dinoBottom < flowerHeight &&
+        dinoBottom + dinoHeight > 0 &&
         !gameOver
       ) {
+        console.log("Colisão detectada:", { dinoBottom, dinoLeft, flowerLeft, flowerWidth, flowerHeight });
         gameOverSound.play();
         gameOver = true;
         clearInterval(flowerInterval);
