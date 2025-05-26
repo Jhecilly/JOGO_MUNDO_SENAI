@@ -1,4 +1,4 @@
-const dino = document.getElementById("dino");
+ const dino = document.getElementById("dino");
 const scoreDisplay = document.getElementById("score");
 const gameOverScreen = document.getElementById("game-over");
 const finalScoreDisplay = document.getElementById("final-score");
@@ -11,12 +11,15 @@ let flowerInterval;
 let flowerIntervals = [];
 let flowers = ["flower1.png", "flower2.png"];
 let flowerIndex = 0;
-let speedMultiplier = 1;
-const maxSpeedMultiplier = 2;
+let speedMultiplier = 1; // Multiplicador de velocidade inicial
+const maxSpeedMultiplier = 2; // Limite máximo de velocidade (2x)
 
+// Carrega o personagem selecionado
 const selectedCharacter = localStorage.getItem('selectedCharacter') || 'char1.png';
-dino.src = selectedCharacter;
+dino.style.backgroundImage = `url('${selectedCharacter}')`;
+dino.style.backgroundSize = "cover";
 
+// Inicia o jogo automaticamente
 startGame();
 
 document.addEventListener("keydown", function (event) {
@@ -33,9 +36,9 @@ function jump() {
   isJumping = true;
   jumpSound.play();
   let up = 0;
-  const baseJumpSpeed = 5;
-  const jumpSpeed = baseJumpSpeed * speedMultiplier;
-  const jumpIntervalTime = Math.max(20 / speedMultiplier, 10);
+  const baseJumpSpeed = 5; // Velocidade base do pulo
+  const jumpSpeed = baseJumpSpeed * speedMultiplier; // Ajusta com o multiplicador
+  const jumpIntervalTime = Math.max(20 / speedMultiplier, 10); // Intervalo diminui com a velocidade
 
   const jumpInterval = setInterval(() => {
     if (up >= 225) {
@@ -57,20 +60,22 @@ function jump() {
 }
 
 function spawnFlower() {
-  const flower = document.createElement("img");
+  const flower = document.createElement("div");
   flower.classList.add("flower");
-  flower.src = flowers[flowerIndex];
+  flower.style.backgroundImage = `url('${flowers[flowerIndex]}')`;
   flowerIndex = (flowerIndex + 1) % flowers.length;
 
   let pos = 1200;
   flower.style.left = pos + "px";
   flower.style.bottom = "0px";
-  flower.style.position = "absolute";
   document.querySelector(".game-container").appendChild(flower);
 
-  const baseFlowerSpeed = 5;
-  const flowerSpeed = baseFlowerSpeed * speedMultiplier;
-  const moveIntervalTime = Math.max(20 / speedMultiplier, 10);
+  // Debug: Verificar posição da flor
+  console.log("Flor criada: bottom =", flower.style.bottom);
+
+  const baseFlowerSpeed = 5; // Velocidade base da flor
+  const flowerSpeed = baseFlowerSpeed * speedMultiplier; // Ajusta com o multiplicador
+  const moveIntervalTime = Math.max(20 / speedMultiplier, 10); // Intervalo diminui com a velocidade
 
   const moveInterval = setInterval(() => {
     if (pos < -75) {
@@ -80,14 +85,32 @@ function spawnFlower() {
       score++;
       scoreDisplay.innerText = "Pontuação: " + score;
 
+      // Aumenta a velocidade a cada 10 pontos
       if (score % 10 === 0) {
         speedMultiplier = Math.min(maxSpeedMultiplier, speedMultiplier + 0.1);
+        console.log("Velocidade aumentada: speedMultiplier =", speedMultiplier);
       }
     } else {
       pos -= flowerSpeed;
       flower.style.left = pos + "px";
 
-      if (!gameOver && checkPixelCollision(dino, flower)) {
+      // Colisão mais precisa
+      const dinoBottom = parseInt(window.getComputedStyle(dino).bottom) || 0;
+      const dinoLeft = 75;
+      const dinoWidth = 60;
+      const dinoHeight = 60;
+      const flowerLeft = pos;
+      const flowerWidth = 75;
+      const flowerHeight = 90;
+
+      if (
+        flowerLeft < dinoLeft + dinoWidth &&
+        flowerLeft + flowerWidth > dinoLeft &&
+        dinoBottom < flowerHeight &&
+        dinoBottom + dinoHeight > 0 &&
+        !gameOver
+      ) {
+        console.log("Colisão detectada:", { dinoBottom, dinoLeft, flowerLeft, flowerWidth, flowerHeight });
         gameOverSound.play();
         gameOver = true;
         clearInterval(flowerInterval);
@@ -104,19 +127,22 @@ function spawnFlower() {
 function startGame() {
   gameOver = false;
   score = 0;
-  speedMultiplier = 1;
+  speedMultiplier = 1; // Reseta a velocidade
   scoreDisplay.innerText = "Pontuação: 0";
   gameOverScreen.style.display = "none";
   flowerInterval = setInterval(spawnFlower, 2000);
 }
 
 function restartGame() {
+  // Remove todas as flores
   document.querySelectorAll(".flower").forEach(flower => flower.remove());
+  // Limpa todos os intervalos de movimento
   flowerIntervals.forEach(id => clearInterval(id));
   flowerIntervals = [];
+  // Reseta o jogo
   gameOver = false;
   score = 0;
-  speedMultiplier = 1;
+  speedMultiplier = 1; // Reseta a velocidade
   scoreDisplay.innerText = "Pontuação: 0";
   gameOverScreen.style.display = "none";
   startGame();
