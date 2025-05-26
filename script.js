@@ -147,3 +147,4 @@ function restartGame() {
   gameOverScreen.style.display = "none";
   startGame();
 }
+
