@@ -9,7 +9,7 @@ let score = 0;
 let gameOver = false;
 let cactoInterval;
 let cactoIntervals = [];
-let cacto = ["minidino.png", "dinomacho.png"];
+let cacto = ["cacto.png", "gordinho.png"];
 let cactoIndex = 0;
 let speedMultiplier = 1; // Multiplicador de velocidade inicial
 const maxSpeedMultiplier = 5; // Limite máximo de velocidade (5x)
@@ -61,27 +61,27 @@ function jump() {
 
 function spawnCacto() {
   const cacto = document.createElement("div");
-  flower.classList.add("flower");
-  flower.style.backgroundImage = `url('${flowers[flowerIndex]}')`;
-  flowerIndex = (flowerIndex + 1) % flowers.length;
+  cacto.classList.add("cacto");
+  cacto.style.backgroundImage = `url('${cacto[cactoIndex]}')`;
+  cactoIndex = (cactoIndex + 1) % cacto.length;
 
   let pos = 1200;
-  flower.style.left = pos + "px";
-  flower.style.bottom = "0px";
-  document.querySelector(".game-container").appendChild(flower);
+  cacto.style.left = pos + "px";
+  cacto.style.bottom = "0px";
+  document.querySelector(".game-container").appendChild(cacto);
 
   // Debug: Verificar posição da flor
-  console.log("Flor criada: bottom =", flower.style.bottom);
+  console.log("Flor criada: bottom =", cacto.style.bottom);
 
-  const baseFlowerSpeed = 5; // Velocidade base da flor
-  const flowerSpeed = baseFlowerSpeed * speedMultiplier; // Ajusta com o multiplicador
+  const baseCactoSpeed = 5; // Velocidade base da flor
+  const cactoSpeed = baseCactoSpeed * speedMultiplier; // Ajusta com o multiplicador
   const moveIntervalTime = Math.max(20 / speedMultiplier, 10); // Intervalo diminui com a velocidade
 
   const moveInterval = setInterval(() => {
     if (pos < -75) {
-      flower.remove();
+      cacto.remove();
       clearInterval(moveInterval);
-      flowerIntervals = flowerIntervals.filter(id => id !== moveInterval);
+      cactoIntervals = cactoIntervals.filter(id => id !== moveInterval);
       score++;
       scoreDisplay.innerText = "Pontuação: " + score;
 
@@ -91,37 +91,37 @@ function spawnCacto() {
         console.log("Velocidade aumentada: speedMultiplier =", speedMultiplier);
       }
     } else {
-      pos -= flowerSpeed;
-      flower.style.left = pos + "px";
+      pos -= cactoSpeed;
+      cacto.style.left = pos + "px";
 
       // Colisão mais precisa
       const dinoBottom = parseInt(window.getComputedStyle(dino).bottom) || 0;
       const dinoLeft = 75;
       const dinoWidth = 60;
       const dinoHeight = 60;
-      const flowerLeft = pos;
-      const flowerWidth = 75;
-      const flowerHeight = 90;
+      const cactoLeft = pos;
+      const cactoWidth = 75;
+      const cactoHeight = 90;
 
       if (
-        flowerLeft < dinoLeft + dinoWidth &&
-        flowerLeft + flowerWidth > dinoLeft &&
-        dinoBottom < flowerHeight &&
+        cactoLeft < dinoLeft + dinoWidth &&
+        cactoLeft + cactoWidth > dinoLeft &&
+        dinoBottom < cactoHeight &&
         dinoBottom + dinoHeight > 0 &&
         !gameOver
       ) {
-        console.log("Colisão detectada:", { dinoBottom, dinoLeft, flowerLeft, flowerWidth, flowerHeight });
+        console.log("Colisão detectada:", { dinoBottom, dinoLeft, cactoLeft, cactoWidth, cactoHeight });
         gameOverSound.play();
         gameOver = true;
-        clearInterval(flowerInterval);
-        flowerIntervals.forEach(id => clearInterval(id));
-        flowerIntervals = [];
+        clearInterval(cactoInterval);
+        cactoIntervals.forEach(id => clearInterval(id));
+        cactoIntervals = [];
         finalScoreDisplay.innerText = score;
         gameOverScreen.style.display = "block";
       }
     }
   }, moveIntervalTime);
-  flowerIntervals.push(moveInterval);
+  cactoIntervals.push(moveInterval);
 }
 
 function startGame() {
@@ -130,15 +130,15 @@ function startGame() {
   speedMultiplier = 1; // Reseta a velocidade
   scoreDisplay.innerText = "Pontuação: 0";
   gameOverScreen.style.display = "none";
-  flowerInterval = setInterval(spawnFlower, 2000);
+  cactoInterval = setInterval(spawnCacto, 2000);
 }
 
 function restartGame() {
   // Remove todas as flores
-  document.querySelectorAll(".flower").forEach(flower => flower.remove());
+  document.querySelectorAll(".cacto").forEach(cacto => cacto.remove());
   // Limpa todos os intervalos de movimento
-  flowerIntervals.forEach(id => clearInterval(id));
-  flowerIntervals = [];
+  cactoIntervals.forEach(id => clearInterval(id));
+  cactoIntervals = [];
   // Reseta o jogo
   gameOver = false;
   score = 0;
