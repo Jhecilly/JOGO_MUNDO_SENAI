@@ -9,7 +9,7 @@ let score = 0;
 let gameOver = false;
 let flowerInterval;
 let flowerIntervals = [];
-let flowers = ["flower1.png", "flower2.png"];
+let flowers = ["minidino.png", "dinomacho.png"];
 let flowerIndex = 0;
 let speedMultiplier = 1; // Multiplicador de velocidade inicial
 const maxSpeedMultiplier = 2; // Limite máximo de velocidade (2x)
