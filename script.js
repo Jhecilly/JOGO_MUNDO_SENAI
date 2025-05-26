@@ -7,15 +7,15 @@ const gameOverSound = new Audio("gameover.mp3");
 let isJumping = false;
 let score = 0;
 let gameOver = false;
-let flowerInterval;
-let flowerIntervals = [];
-let flowers = ["minidino.png", "dinomacho.png"];
-let flowerIndex = 0;
+let cactoInterval;
+let cactoIntervals = [];
+let cacto = ["minidino.png", "dinomacho.png"];
+let cactoIndex = 0;
 let speedMultiplier = 1; // Multiplicador de velocidade inicial
-const maxSpeedMultiplier = 2; // Limite máximo de velocidade (2x)
+const maxSpeedMultiplier = 5; // Limite máximo de velocidade (5x)
 
 // Carrega o personagem selecionado
-const selectedCharacter = localStorage.getItem('selectedCharacter') || 'char1.png';
+const selectedCharacter = localStorage.getItem('selectedCharacter') || 'minidino.png';
 dino.style.backgroundImage = `url('${selectedCharacter}')`;
 dino.style.backgroundSize = "cover";
 
@@ -59,8 +59,8 @@ function jump() {
   }, jumpIntervalTime);
 }
 
-function spawnFlower() {
-  const flower = document.createElement("div");
+function spawnCacto() {
+  const cacto = document.createElement("div");
   flower.classList.add("flower");
   flower.style.backgroundImage = `url('${flowers[flowerIndex]}')`;
   flowerIndex = (flowerIndex + 1) % flowers.length;
