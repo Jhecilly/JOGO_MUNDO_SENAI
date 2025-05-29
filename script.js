@@ -1,4 +1,4 @@
- const dino = document.getElementById("dino");
+const dino = document.getElementById("dino");
 const scoreDisplay = document.getElementById("score");
 const gameOverScreen = document.getElementById("game-over");
 const finalScoreDisplay = document.getElementById("final-score");
@@ -147,4 +147,3 @@ function restartGame() {
   gameOverScreen.style.display = "none";
   startGame();
 }
-
