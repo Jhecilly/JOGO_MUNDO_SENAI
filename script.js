@@ -1,149 +1,163 @@
+// script.js atualizado completo com colisão refinada, pontuação por tempo e aumento de velocidade
+
 const dino = document.getElementById("dino");
+const ground = document.getElementById("ground");
 const scoreDisplay = document.getElementById("score");
-const gameOverScreen = document.getElementById("game-over");
-const finalScoreDisplay = document.getElementById("final-score");
-const jumpSound = new Audio("jump.mp3");
-const gameOverSound = new Audio("gameover.mp3");
+const gameOverScreen = document.getElementById("gameOver");
+const finalScoreDisplay = document.getElementById("finalScore");
+const jumpSound = document.getElementById("jumpSound");
+const scoreSound = document.getElementById("scoreSound");
+const gameOverSound = document.getElementById("gameOverSound");
+
 let isJumping = false;
+let isRunning = false;
 let score = 0;
 let gameOver = false;
 let flowerInterval;
 let flowerIntervals = [];
-let flowers = ["flower1.png", "flower2.png"];
-let flowerIndex = 0;
-let speedMultiplier = 1; // Multiplicador de velocidade inicial
-const maxSpeedMultiplier = 2; // Limite máximo de velocidade (2x)
+let speedMultiplier = 1;
+const maxSpeedMultiplier = 2; // você pode ajustar se quiser mais rápido
+let timeScoreInterval;
+let gameTime = 0;
 
-// Carrega o personagem selecionado
-const selectedCharacter = localStorage.getItem('selectedCharacter') || 'char1.png';
-dino.style.backgroundImage = `url('${selectedCharacter}')`;
-dino.style.backgroundSize = "cover";
+function jump() {
+  if (isJumping) return;
+  isJumping = true;
+  jumpSound.play();
 
-// Inicia o jogo automaticamente
-startGame();
+  let position = 0;
+  let upInterval = setInterval(() => {
+    if (position >= 150) {
+      clearInterval(upInterval);
+      let downInterval = setInterval(() => {
+        if (position <= 0) {
+          clearInterval(downInterval);
+          isJumping = false;
+        } else {
+          position -= 5 * speedMultiplier;
+          dino.style.bottom = position + "px";
+        }
+      }, 20);
+    } else {
+      position += 5 * speedMultiplier;
+      dino.style.bottom = position + "px";
+    }
+  }, 20);
+}
 
-document.addEventListener("keydown", function (event) {
+function createFlower() {
+  const flower = document.createElement("div");
+  flower.classList.add("flower");
+  flower.style.left = "100%";
+  ground.appendChild(flower);
+
+  let flowerInterval = setInterval(() => {
+    let flowerLeft = parseInt(flower.style.left);
+    if (flowerLeft < -60) {
+      clearInterval(flowerInterval);
+      ground.removeChild(flower);
+      score++;
+      scoreDisplay.innerText = "Pontuação: " + score;
+      scoreSound.play();
+    } else {
+      flower.style.left = flowerLeft - 10 * speedMultiplier + "px";
+    }
+
+    // Pega dimensões reais
+    let dinoLeft = dino.offsetLeft;
+    let dinoBottom = parseInt(window.getComputedStyle(dino).bottom);
+    let dinoWidth = dino.offsetWidth;
+    let dinoHeight = dino.offsetHeight;
+
+    let flowerWidth = flower.offsetWidth;
+    let flowerHeight = flower.offsetHeight;
+
+    // Define hitboxes menores (colisão refinada)
+    const dinoHitbox = {
+      left: dinoLeft + 10,
+      right: dinoLeft + dinoWidth - 10,
+      bottom: dinoBottom + 5,
+      top: dinoBottom + dinoHeight - 5
+    };
+
+    const flowerHitbox = {
+      left: flowerLeft + 10,
+      right: flowerLeft + flowerWidth - 10,
+      bottom: 0,
+      top: flowerHeight - 10
+    };
+
+    if (
+      dinoHitbox.right > flowerHitbox.left &&
+      dinoHitbox.left < flowerHitbox.right &&
+      dinoHitbox.top > flowerHitbox.bottom &&
+      dinoHitbox.bottom < flowerHitbox.top &&
+      !gameOver
+    ) {
+      console.log("Colisão precisa detectada!");
+      gameOverSound.play();
+      gameOver = true;
+      clearInterval(flowerInterval);
+      flowerIntervals.forEach(id => clearInterval(id));
+      flowerIntervals = [];
+      clearInterval(timeScoreInterval);
+      finalScoreDisplay.innerText = score;
+      gameOverScreen.style.display = "block";
+    }
+  }, 20);
+
+  flowerIntervals.push(flowerInterval);
+}
+
+function spawnFlower() {
+  createFlower();
+}
+
+function startGame() {
+  gameOver = false;
+  isJumping = false;
+  isRunning = true;
+  score = 0;
+  gameTime = 0;
+  speedMultiplier = 1;
+  scoreDisplay.innerText = "Pontuação: 0";
+  gameOverScreen.style.display = "none";
+
+  // Gera flores a cada 2 segundos, ajustável com a velocidade
+  flowerInterval = setInterval(spawnFlower, 2000);
+
+  // Pontuação por tempo jogado
+  timeScoreInterval = setInterval(() => {
+    gameTime++;
+    score++;
+    scoreDisplay.innerText = "Pontuação: " + score;
+
+    if (score % 100 === 0) {
+      speedMultiplier = Math.min(maxSpeedMultiplier, speedMultiplier + 0.1);
+      console.log("Velocidade aumentada: speedMultiplier =", speedMultiplier);
+      clearInterval(flowerInterval);
+      const newSpawnRate = Math.max(2000 / speedMultiplier, 500);
+      flowerInterval = setInterval(spawnFlower, newSpawnRate);
+    }
+  }, 1000);
+}
+
+function restartGame() {
+  clearInterval(flowerInterval);
+  clearInterval(timeScoreInterval);
+  ground.innerHTML = "";
+  ground.appendChild(dino);
+  startGame();
+}
+
+document.addEventListener("keydown", event => {
   if (event.code === "Space") {
-    if (gameOver) {
-      restartGame();
-    } else if (!isJumping) {
+    if (!isRunning) {
+      startGame();
+    } else {
       jump();
     }
   }
 });
 
-function jump() {
-  isJumping = true;
-  jumpSound.play();
-  let up = 0;
-  const baseJumpSpeed = 5; // Velocidade base do pulo
-  const jumpSpeed = baseJumpSpeed * speedMultiplier; // Ajusta com o multiplicador
-  const jumpIntervalTime = Math.max(20 / speedMultiplier, 10); // Intervalo diminui com a velocidade
-
-  const jumpInterval = setInterval(() => {
-    if (up >= 225) {
-      clearInterval(jumpInterval);
-      const downInterval = setInterval(() => {
-        if (up <= 0) {
-          clearInterval(downInterval);
-          isJumping = false;
-        } else {
-          up -= jumpSpeed;
-          dino.style.bottom = up + "px";
-        }
-      }, jumpIntervalTime);
-    } else {
-      up += jumpSpeed;
-      dino.style.bottom = up + "px";
-    }
-  }, jumpIntervalTime);
-}
-
-function spawnFlower() {
-  const flower = document.createElement("div");
-  flower.classList.add("flower");
-  flower.style.backgroundImage = `url('${flowers[flowerIndex]}')`;
-  flowerIndex = (flowerIndex + 1) % flowers.length;
-
-  let pos = 1200;
-  flower.style.left = pos + "px";
-  flower.style.bottom = "0px";
-  document.querySelector(".game-container").appendChild(flower);
-
-  // Debug: Verificar posição da flor
-  console.log("Flor criada: bottom =", flower.style.bottom);
-
-  const baseFlowerSpeed = 5; // Velocidade base da flor
-  const flowerSpeed = baseFlowerSpeed * speedMultiplier; // Ajusta com o multiplicador
-  const moveIntervalTime = Math.max(20 / speedMultiplier, 10); // Intervalo diminui com a velocidade
-
-  const moveInterval = setInterval(() => {
-    if (pos < -75) {
-      flower.remove();
-      clearInterval(moveInterval);
-      flowerIntervals = flowerIntervals.filter(id => id !== moveInterval);
-      score++;
-      scoreDisplay.innerText = "Pontuação: " + score;
-
-      // Aumenta a velocidade a cada 10 pontos
-      if (score % 10 === 0) {
-        speedMultiplier = Math.min(maxSpeedMultiplier, speedMultiplier + 0.1);
-        console.log("Velocidade aumentada: speedMultiplier =", speedMultiplier);
-      }
-    } else {
-      pos -= flowerSpeed;
-      flower.style.left = pos + "px";
-
-      // Colisão mais precisa
-      const dinoBottom = parseInt(window.getComputedStyle(dino).bottom) || 0;
-      const dinoLeft = 75;
-      const dinoWidth = 60;
-      const dinoHeight = 60;
-      const flowerLeft = pos;
-      const flowerWidth = 75;
-      const flowerHeight = 90;
-
-      if (
-        flowerLeft < dinoLeft + dinoWidth &&
-        flowerLeft + flowerWidth > dinoLeft &&
-        dinoBottom < flowerHeight &&
-        dinoBottom + dinoHeight > 0 &&
-        !gameOver
-      ) {
-        console.log("Colisão detectada:", { dinoBottom, dinoLeft, flowerLeft, flowerWidth, flowerHeight });
-        gameOverSound.play();
-        gameOver = true;
-        clearInterval(flowerInterval);
-        flowerIntervals.forEach(id => clearInterval(id));
-        flowerIntervals = [];
-        finalScoreDisplay.innerText = score;
-        gameOverScreen.style.display = "block";
-      }
-    }
-  }, moveIntervalTime);
-  flowerIntervals.push(moveInterval);
-}
-
-function startGame() {
-  gameOver = false;
-  score = 0;
-  speedMultiplier = 1; // Reseta a velocidade
-  scoreDisplay.innerText = "Pontuação: 0";
-  gameOverScreen.style.display = "none";
-  flowerInterval = setInterval(spawnFlower, 2000);
-}
-
-function restartGame() {
-  // Remove todas as flores
-  document.querySelectorAll(".flower").forEach(flower => flower.remove());
-  // Limpa todos os intervalos de movimento
-  flowerIntervals.forEach(id => clearInterval(id));
-  flowerIntervals = [];
-  // Reseta o jogo
-  gameOver = false;
-  score = 0;
-  speedMultiplier = 1; // Reseta a velocidade
-  scoreDisplay.innerText = "Pontuação: 0";
-  gameOverScreen.style.display = "none";
-  startGame();
-}
+document.getElementById("restartButton").addEventListener("click", restartGame);
